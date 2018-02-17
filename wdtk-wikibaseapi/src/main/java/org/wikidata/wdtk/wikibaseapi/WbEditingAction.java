@@ -555,6 +555,52 @@ public class WbEditingAction {
 	}
 	
 	/**
+	 * Executes the API action "wbremoveclaims" for the given parameters.
+	 * 
+	 * @param statementIds
+	 *            the statement ids to delete
+	 * @param bot
+	 *            if true, edits will be flagged as "bot edits" provided that
+	 *            the logged in user is in the bot group; for regular users, the
+	 *            flag will just be ignored
+	 * @param baserevid
+	 *            the revision of the data that the edit refers to or 0 if this
+	 *            should not be submitted; when used, the site will ensure that
+	 *            no edit has happened since this revision to detect edit
+	 *            conflicts; it is recommended to use this whenever in all
+	 *            operations where the outcome depends on the state of the
+	 *            online data
+	 * @param summary
+	 *            summary for the edit; will be prepended by an automatically
+	 *            generated comment; the length limit of the autocomment
+	 *            together with the summary is 260 characters: everything above
+	 *            that limit will be cut off
+	 * @return the JSON response from the API
+	 * @throws IOException
+	 *             if there was an IO problem. such as missing network
+	 *             connection
+	 * @throws MediaWikiApiErrorException
+	 *             if the API returns an error
+	 * @throws IOException
+	 * @throws MediaWikiApiErrorException
+	 */
+	public JsonNode wbRemoveClaims(List<String> statementIds,
+			boolean bot, long baserevid, String summary)
+					throws IOException, MediaWikiApiErrorException {
+		Validate.notNull(statementIds,
+				"statementIds parameter cannot be null when deleting statements");
+		Validate.notEmpty(statementIds,
+				"statement ids to delete must be non-empty when deleting statements");
+		Validate.isTrue(statementIds.size() <= 50,
+				"At most 50 statements can be deleted at once");
+		
+		Map<String, String> parameters = new HashMap<String, String>();
+		parameters.put("claim", String.join("|", statementIds));
+		
+		return performAPIAction("wbremoveclaims", null, null, null, null, parameters, summary, baserevid, bot);
+	}
+	
+	/**
 	 * Executes an editing API action for the given parameters. The resulting
 	 * entity returned by Wikibase is returned as a result.
 	 * <p>
@@ -616,7 +662,6 @@ public class WbEditingAction {
 			throws IOException, MediaWikiApiErrorException {
 		
 		parameters.put(ApiConnection.PARAM_ACTION, action);
-		System.out.println("----"+action+"-----");
 		
 		if (newEntity != null) {
 			parameters.put("new", newEntity);
@@ -637,7 +682,7 @@ public class WbEditingAction {
 			}
 			parameters.put("site", site);
 			parameters.put("title", title);
-		} else if (!"wbsetclaim".equals(action)) {
+		} else if (!"wbsetclaim".equals(action) && !"wbremoveclaims".equals(action)) {
 			throw new IllegalArgumentException(
 					"This action must create a new item, or specify an id, or specify a site and title.");
 		}
@@ -673,7 +718,6 @@ public class WbEditingAction {
 		while (retry > 0) {
 			try {
 				result = this.connection.sendJsonRequest("POST", parameters);
-				System.out.println(result.toString());
 				break;
 			} catch (TokenErrorException e) { // try again with a fresh token
 				lastException = e;

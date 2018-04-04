@@ -39,7 +39,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.jsoniter.JsonIterator;
 
 /**
@@ -48,10 +47,10 @@ import com.jsoniter.JsonIterator;
  * @author Markus Kroetzsch
  *
  */
-public class JsonDumpFileProcessor implements MwDumpFileProcessor {
+public class JsonIterDumpFileProcessor implements MwDumpFileProcessor {
 
 	static final Logger logger = LoggerFactory
-			.getLogger(JsonDumpFileProcessor.class);
+			.getLogger(JsonIterDumpFileProcessor.class);
 
 	private final ObjectMapper mapper;
 	private final ObjectReader documentReader;
@@ -59,13 +58,11 @@ public class JsonDumpFileProcessor implements MwDumpFileProcessor {
 	private final EntityDocumentProcessor entityDocumentProcessor;
 	private final String siteIri;
 
-	public JsonDumpFileProcessor(
+	public JsonIterDumpFileProcessor(
 			EntityDocumentProcessor entityDocumentProcessor, String siteIri) {
 		this.entityDocumentProcessor = entityDocumentProcessor;
 		this.siteIri = siteIri;
 		this.mapper = new DatamodelMapper(siteIri);
-		logger.info("Registering afterburner");
-		mapper.registerModule(new AfterburnerModule());
 		this.documentReader = this.mapper
 				.reader(TermedStatementDocumentImpl.class)
 				.with(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
@@ -118,7 +115,7 @@ public class JsonDumpFileProcessor implements MwDumpFileProcessor {
 	 *            the exception to log
 	 */
 	private void logJsonProcessingException(JsonProcessingException exception) {
-		JsonDumpFileProcessor.logger
+		JsonIterDumpFileProcessor.logger
 				.error("Error when reading JSON for entity: "
 						+ exception.getMessage());
 	}
@@ -155,7 +152,7 @@ public class JsonDumpFileProcessor implements MwDumpFileProcessor {
 	 */
 	private void processDumpFileContentsRecovery(InputStream inputStream)
 			throws IOException {
-		JsonDumpFileProcessor.logger
+		JsonIterDumpFileProcessor.logger
 				.warn("Entering recovery mode to parse rest of file. This might be slightly slower.");
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -170,7 +167,7 @@ public class JsonDumpFileProcessor implements MwDumpFileProcessor {
 			line = line.substring(0, 100) + "[...]"
 					+ line.substring(line.length() - 50);
 		}
-		JsonDumpFileProcessor.logger.warn("Skipping rest of current line: "
+		JsonIterDumpFileProcessor.logger.warn("Skipping rest of current line: "
 				+ line);
 
 		line = br.readLine();
@@ -186,7 +183,7 @@ public class JsonDumpFileProcessor implements MwDumpFileProcessor {
 				handleDocument(document);
 			} catch (JsonProcessingException e) {
 				logJsonProcessingException(e);
-				JsonDumpFileProcessor.logger.error("Problematic line was: "
+				JsonIterDumpFileProcessor.logger.error("Problematic line was: "
 						+ line.substring(0, Math.min(50, line.length()))
 						+ "...");
 			}

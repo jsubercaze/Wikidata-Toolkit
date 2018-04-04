@@ -67,6 +67,7 @@ public class DataExtractionProcessor implements EntityDocumentProcessor {
 		DataExtractionProcessor.printDocumentation();
 
 		DataExtractionProcessor processor = new DataExtractionProcessor();
+		
 		ExampleHelpers.processEntitiesFromWikidataDump(processor);
 		processor.close();
 	}

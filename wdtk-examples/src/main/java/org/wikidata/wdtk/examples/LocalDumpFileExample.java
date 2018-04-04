@@ -39,7 +39,7 @@ public class LocalDumpFileExample {
 	/**
 	 * Path to the dump that should be processed
 	 */
-	private final static String DUMP_FILE = "./src/resources/sample-dump-20150815.json.gz";
+	private final static String DUMP_FILE = "E:/Data/wikidata/latest-all.json";
 
 	public static void main(String[] args) throws IOException {
 		ExampleHelpers.configureLogging();
@@ -61,6 +61,7 @@ public class LocalDumpFileExample {
 		System.out
 				.println("(meta-data like the date is guessed from the file name):");
 		MwLocalDumpFile mwDumpFile = new MwLocalDumpFile(DUMP_FILE);
+		mwDumpFile.setDumpContentType(DumpContentType.JSONU);
 		dumpProcessingController.processDump(mwDumpFile);
 
 		// Select local file and set meta-data:

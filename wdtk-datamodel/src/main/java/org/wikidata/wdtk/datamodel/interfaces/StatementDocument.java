@@ -86,7 +86,8 @@ public interface StatementDocument extends EntityDocument {
 	 */
 	default StatementGroup findStatementGroup(String propertyId) {
 		for (StatementGroup sg : getStatementGroups()) {
-			if (propertyId.equals(sg.getProperty().getId())) {
+			String id = sg.getProperty().getId();
+			if (propertyId.equals(id)) {
 				return sg;
 			}
 		}
@@ -166,10 +167,9 @@ public interface StatementDocument extends EntityDocument {
 	 *            the set of values to search
 	 * @return true if a statement for this property and value exists
 	 */
-	default boolean hasStatementValue(PropertyIdValue propertyIdValue,
-			Set<? extends Value> values) {
+	default boolean hasStatementValue(PropertyIdValue propertyIdValue, Set<? extends Value> values) {
 		StatementGroup statementGroup = findStatementGroup(propertyIdValue);
-		if(statementGroup == null) {
+		if (statementGroup == null) {
 			return false;
 		}
 		for (Statement statement : statementGroup) {
@@ -197,7 +197,7 @@ public interface StatementDocument extends EntityDocument {
 	 */
 	default boolean hasStatementValue(String propertyId, Set<? extends Value> values) {
 		StatementGroup statementGroup = findStatementGroup(propertyId);
-		if(statementGroup == null) {
+		if (statementGroup == null) {
 			return false;
 		}
 		for (Statement statement : statementGroup) {
@@ -220,9 +220,7 @@ public interface StatementDocument extends EntityDocument {
 	 */
 	default Statement findStatement(PropertyIdValue propertyIdValue) {
 		StatementGroup statementGroup = findStatementGroup(propertyIdValue);
-		return (statementGroup != null && statementGroup.size() == 1)
-				? statementGroup.getStatements().get(0)
-				: null;
+		return (statementGroup != null && statementGroup.size() == 1) ? statementGroup.getStatements().get(0) : null;
 	}
 
 	/**
@@ -240,9 +238,12 @@ public interface StatementDocument extends EntityDocument {
 	 */
 	default Statement findStatement(String propertyId) {
 		StatementGroup statementGroup = findStatementGroup(propertyId);
-		return (statementGroup != null && statementGroup.size() == 1)
-				? statementGroup.getStatements().get(0)
-				: null;
+		return (statementGroup != null && statementGroup.size() == 1) ? statementGroup.getStatements().get(0) : null;
+	}
+
+	default Statement findFirstStatement(String propertyId) {
+		StatementGroup statementGroup = findStatementGroup(propertyId);
+		return (statementGroup != null) ? statementGroup.getStatements().get(0) : null;
 	}
 
 	/**
@@ -361,8 +362,7 @@ public interface StatementDocument extends EntityDocument {
 	 *            the property to search for
 	 * @return {@link GlobeCoordinatesValue} or null
 	 */
-	default GlobeCoordinatesValue findStatementGlobeCoordinatesValue(
-			PropertyIdValue propertyIdValue) {
+	default GlobeCoordinatesValue findStatementGlobeCoordinatesValue(PropertyIdValue propertyIdValue) {
 		Value value = findStatementValue(propertyIdValue);
 		return value instanceof GlobeCoordinatesValue ? (GlobeCoordinatesValue) value : null;
 	}
@@ -432,8 +432,7 @@ public interface StatementDocument extends EntityDocument {
 	 *            the property to search for
 	 * @return {@link MonolingualTextValue} or null
 	 */
-	default MonolingualTextValue findStatementMonolingualTextValue(
-			PropertyIdValue propertyIdValue) {
+	default MonolingualTextValue findStatementMonolingualTextValue(PropertyIdValue propertyIdValue) {
 		Value value = findStatementValue(propertyIdValue);
 		return value instanceof MonolingualTextValue ? (MonolingualTextValue) value : null;
 	}

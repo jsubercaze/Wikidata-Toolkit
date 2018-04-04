@@ -469,6 +469,9 @@ public class DumpProcessingController {
 		case JSON:
 			dumpFileProcessor = getJsonDumpFileProcessor();
 			break;
+		case JSONU:
+			dumpFileProcessor = getJsonDumpFileProcessor();
+			break;
 		case SITES:
 		default:
 			logger.error("Dumps of type " + dumpFile.getDumpContentType()

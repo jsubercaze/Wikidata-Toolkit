@@ -70,7 +70,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 	/**
 	 * Type of this dumpfile
 	 */
-	final DumpContentType dumpContentType;
+	DumpContentType dumpContentType;
 
 	/**
 	 * DirectoryManager for accessing the dumpfile
@@ -87,16 +87,12 @@ public class MwLocalDumpFile implements MwDumpFile {
 	 */
 	static final Map<DumpContentType, CompressionType> COMPRESSION_TYPE = new HashMap<DumpContentType, CompressionType>();
 	static {
-		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.DAILY,
-				CompressionType.BZ2);
-		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.CURRENT,
-				CompressionType.BZ2);
-		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.FULL,
-				CompressionType.BZ2);
-		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.SITES,
-				CompressionType.GZIP);
-		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.JSON,
-				CompressionType.GZIP);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.DAILY, CompressionType.BZ2);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.CURRENT, CompressionType.BZ2);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.FULL, CompressionType.BZ2);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.SITES, CompressionType.GZIP);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.JSON, CompressionType.GZIP);
+		MwLocalDumpFile.COMPRESSION_TYPE.put(DumpContentType.JSONU, CompressionType.NONE);
 	}
 
 	/**
@@ -127,14 +123,12 @@ public class MwLocalDumpFile implements MwDumpFile {
 	 *            project name string, or null to use a default string; this is
 	 *            mainly used for logs and messages
 	 */
-	public MwLocalDumpFile(String filePath, DumpContentType dumpContentType,
-			String dateStamp, String projectName) {
+	public MwLocalDumpFile(String filePath, DumpContentType dumpContentType, String dateStamp, String projectName) {
 		this.dumpFilePath = Paths.get(filePath).toAbsolutePath();
 		this.dumpFileName = this.dumpFilePath.getFileName().toString();
 
 		try {
-			this.directoryManager = DirectoryManagerFactory
-					.createDirectoryManager(this.dumpFilePath.getParent(), true);
+			this.directoryManager = DirectoryManagerFactory.createDirectoryManager(this.dumpFilePath.getParent(), true);
 		} catch (IOException e) {
 			this.directoryManager = null;
 			logger.error("Could not access local dump file: " + e.toString());
@@ -158,8 +152,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 			this.projectName = projectName;
 		}
 
-		this.isAvailable = this.directoryManager != null
-				&& this.directoryManager.hasFile(this.dumpFileName);
+		this.isAvailable = this.directoryManager != null && this.directoryManager.hasFile(this.dumpFileName);
 	}
 
 	/**
@@ -191,12 +184,15 @@ public class MwLocalDumpFile implements MwDumpFile {
 		return this.dumpContentType;
 	}
 
+	public void setDumpContentType(DumpContentType dumpContentType) {
+		this.dumpContentType = dumpContentType;
+	}
+
 	@Override
 	public InputStream getDumpFileStream() throws IOException {
 		if (!isAvailable()) {
-			throw new IOException("Local dump file \""
-					+ this.dumpFilePath.toString()
-					+ "\" is not available for reading.");
+			throw new IOException(
+					"Local dump file \"" + this.dumpFilePath.toString() + "\" is not available for reading.");
 		}
 		return this.directoryManager.getInputStreamForFile(this.dumpFileName,
 				MwLocalDumpFile.COMPRESSION_TYPE.get(this.dumpContentType));
@@ -204,8 +200,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 
 	@Override
 	public BufferedReader getDumpFileReader() throws IOException {
-		return new BufferedReader(new InputStreamReader(getDumpFileStream(),
-				StandardCharsets.UTF_8));
+		return new BufferedReader(new InputStreamReader(getDumpFileStream(), StandardCharsets.UTF_8));
 	}
 
 	@Override
@@ -216,8 +211,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 	@Override
 	public String toString() {
 		return this.dumpFilePath.toString() + " (" + this.projectName + "/"
-				+ getDumpContentType().toString().toLowerCase() + "/"
-				+ this.dateStamp + ")";
+				+ getDumpContentType().toString().toLowerCase() + "/" + this.dateStamp + ")";
 	}
 
 	/**
@@ -243,8 +237,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 				return DumpContentType.FULL;
 			}
 		} else {
-			logger.warn("Could not guess type of the dump file \"" + fileName
-					+ "\". Defaulting to json.gz.");
+			logger.warn("Could not guess type of the dump file \"" + fileName + "\". Defaulting to json.gz.");
 			return DumpContentType.JSON;
 		}
 	}
@@ -262,8 +255,7 @@ public class MwLocalDumpFile implements MwDumpFile {
 		if (m.find()) {
 			return m.group(1);
 		} else {
-			logger.info("Could not guess date of the dump file \"" + fileName
-					+ "\". Defaulting to YYYYMMDD.");
+			logger.info("Could not guess date of the dump file \"" + fileName + "\". Defaulting to YYYYMMDD.");
 			return "YYYYMMDD";
 		}
 	}

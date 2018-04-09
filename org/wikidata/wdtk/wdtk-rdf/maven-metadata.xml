@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.wikidata.wdtk</groupId>
+  <artifactId>wdtk-rdf</artifactId>
+  <versioning>
+    <versions>
+      <version>0.9.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20180409081846</lastUpdated>
+  </versioning>
+</metadata>
